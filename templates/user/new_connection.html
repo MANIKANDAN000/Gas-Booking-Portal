@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}New Connection - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('user.dashboard') }}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.book') }}">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Book Cylinder</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.orders') }}">
+                    <i class="fas fa-box"></i>
+                    <span>My Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.new_connection') }}" class="active">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Connection</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.profile') }}">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-plus-circle"></i> New LPG Connection</h1>
+                <p class="page-subtitle">Apply for a new gas connection</p>
+            </div>
+        </div>
+
+        <!-- Connection Form -->
+        <div class="dashboard-card booking-form-container" data-aos="fade-up">
+            <form method="POST" action="{{ url_for('user.new_connection') }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="connection_type">Connection Type</label>
+                        <select name="connection_type" id="connection_type" required>
+                            <option value="domestic">Domestic</option>
+                            <option value="commercial">Commercial</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_proof">ID Proof Type</label>
+                        <select name="id_proof" id="id_proof" required>
+                            <option value="aadhar">Aadhar Card</option>
+                            <option value="pan">PAN Card</option>
+                            <option value="passport">Passport</option>
+                            <option value="voter_id">Voter ID</option>
+                            <option value="driving_license">Driving License</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address_proof">Address Proof Type</label>
+                    <select name="address_proof" id="address_proof" required>
+                        <option value="aadhar">Aadhar Card</option>
+                        <option value="utility_bill">Utility Bill</option>
+                        <option value="bank_statement">Bank Statement</option>
+                        <option value="rent_agreement">Rent Agreement</option>
+                        <option value="passport">Passport</option>
+                    </select>
+                </div>
+
+                <div class="price-summary"
+                    style="background: rgba(0, 212, 170, 0.1); border-color: rgba(0, 212, 170, 0.3);">
+                    <h4 style="margin-bottom: 15px; color: var(--accent);"><i class="fas fa-info-circle"></i> Important
+                        Information</h4>
+                    <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px;">
+                        <li>Processing time: 3-5 business days</li>
+                        <li>Security deposit will be collected at the time of connection</li>
+                        <li>Our representative will visit for document verification</li>
+                        <li>Keep original documents ready for verification</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Submit Application</span>
+                    </button>
+                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-glass btn-lg" style="margin-left: 10px;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

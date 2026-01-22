@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Cylinder - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('user.dashboard') }}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.book') }}" class="active">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Book Cylinder</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.orders') }}">
+                    <i class="fas fa-box"></i>
+                    <span>My Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.new_connection') }}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Connection</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.profile') }}">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-gas-pump"></i> Book Gas Cylinder</h1>
+                <p class="page-subtitle">Fill in the details to place your order</p>
+            </div>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="dashboard-card booking-form-container" data-aos="fade-up">
+            <form method="POST" action="{{ url_for('user.book') }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quantity">Number of Cylinders</label>
+                        <select name="quantity" id="quantity" required onchange="updatePrice()">
+                            <option value="1">1 Cylinder</option>
+                            <option value="2">2 Cylinders</option>
+                            <option value="3">3 Cylinders</option>
+                            <option value="4">4 Cylinders</option>
+                            <option value="5">5 Cylinders</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method</label>
+                        <select name="payment_method" id="payment_method">
+                            <option value="cod">Cash on Delivery</option>
+                            <option value="upi">UPI</option>
+                            <option value="card">Credit/Debit Card</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="delivery_address">Delivery Address</label>
+                    <textarea name="delivery_address" id="delivery_address" rows="3"
+                        placeholder="Enter your complete delivery address"
+                        required>{{ current_user.address or '' }}</textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="notes">Special Instructions (Optional)</label>
+                    <textarea name="notes" id="notes" rows="2"
+                        placeholder="Any special delivery instructions..."></textarea>
+                </div>
+
+                <!-- Price Summary -->
+                <div class="price-summary">
+                    <div class="price-row">
+                        <span>Cylinder Price (₹{{ cylinder_price }} × <span id="qty-display">1</span>)</span>
+                        <span id="cylinder-total">₹{{ cylinder_price }}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Delivery Charge</span>
+                        <span>₹{{ delivery_charge }}</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total Amount</span>
+                        <span id="total-amount">₹{{ cylinder_price + delivery_charge }}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Confirm Booking</span>
+                    </button>
+                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-glass btn-lg" style="margin-left: 10px;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script>
+    const cylinderPrice = {{ cylinder_price }};
+    const deliveryCharge = {{ delivery_charge }};
+
+    function updatePrice() {
+        const qty = document.getElementById('quantity').value;
+        const cylinderTotal = cylinderPrice * qty;
+        const total = cylinderTotal + deliveryCharge;
+
+        document.getElementById('qty-display').textContent = qty;
+        document.getElementById('cylinder-total').textContent = '₹' + cylinderTotal;
+        document.getElementById('total-amount').textContent = '₹' + total;
+    }
+</script>
+{% endblock %}

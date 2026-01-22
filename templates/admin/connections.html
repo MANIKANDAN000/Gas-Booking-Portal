@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Connections - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.bookings') }}">
+                    <i class="fas fa-box"></i>
+                    <span>Bookings</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.connections') }}" class="active">
+                    <i class="fas fa-plug"></i>
+                    <span>Connections</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-plug"></i> Connection Requests</h1>
+                <p class="page-subtitle">Manage new LPG connection applications</p>
+            </div>
+        </div>
+
+        <!-- Connections Table -->
+        <div class="dashboard-card" data-aos="fade-up">
+            {% if connections %}
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Applicant</th>
+                        <th>Type</th>
+                        <th>ID Proof</th>
+                        <th>Address Proof</th>
+                        <th>Status</th>
+                        <th>Applied On</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for connection in connections %}
+                    <tr>
+                        <td>#{{ connection.id }}</td>
+                        <td>
+                            <div>
+                                <strong>{{ connection.user.name }}</strong>
+                                <br>
+                                <small style="color: var(--text-muted);">{{ connection.user.email }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="text-transform: capitalize;">{{ connection.connection_type }}</span>
+                        </td>
+                        <td style="text-transform: capitalize;">{{ connection.id_proof | replace('_', ' ') }}</td>
+                        <td style="text-transform: capitalize;">{{ connection.address_proof | replace('_', ' ') }}</td>
+                        <td>
+                            <span class="status-badge status-{{ connection.status }}">
+                                {{ connection.status }}
+                            </span>
+                        </td>
+                        <td>{{ connection.created_at.strftime('%d %b %Y') }}</td>
+                        <td>
+                            <form method="POST"
+                                action="{{ url_for('admin.update_connection', connection_id=connection.id) }}">
+                                <select name="status" onchange="this.form.submit()"
+                                    style="padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer; font-size: 0.85rem;">
+                                    <option value="pending" {% if connection.status=='pending' %}selected{% endif %}>⏳
+                                        Pending</option>
+                                    <option value="approved" {% if connection.status=='approved' %}selected{% endif %}>✓
+                                        Approved</option>
+                                    <option value="rejected" {% if connection.status=='rejected' %}selected{% endif %}>✗
+                                        Rejected</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-plug"></i>
+                <h3>No connection requests</h3>
+                <p>New connection applications will appear here</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Bookings - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.bookings') }}" class="active">
+                    <i class="fas fa-box"></i>
+                    <span>Bookings</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.connections') }}">
+                    <i class="fas fa-plug"></i>
+                    <span>Connections</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-box"></i> Manage Bookings</h1>
+                <p class="page-subtitle">View and update all gas cylinder bookings</p>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs" data-aos="fade-up">
+            <a href="{{ url_for('admin.bookings') }}"
+                class="filter-tab {% if current_filter == 'all' %}active{% endif %}">All</a>
+            <a href="{{ url_for('admin.bookings', status='pending') }}"
+                class="filter-tab {% if current_filter == 'pending' %}active{% endif %}">Pending</a>
+            <a href="{{ url_for('admin.bookings', status='confirmed') }}"
+                class="filter-tab {% if current_filter == 'confirmed' %}active{% endif %}">Confirmed</a>
+            <a href="{{ url_for('admin.bookings', status='paid') }}"
+                class="filter-tab {% if current_filter == 'paid' %}active{% endif %}">Paid</a>
+            <a href="{{ url_for('admin.bookings', status='delivered') }}"
+                class="filter-tab {% if current_filter == 'delivered' %}active{% endif %}">Delivered</a>
+            <a href="{{ url_for('admin.bookings', status='cancelled') }}"
+                class="filter-tab {% if current_filter == 'cancelled' %}active{% endif %}">Cancelled</a>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="dashboard-card" data-aos="fade-up">
+            {% if bookings %}
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Qty</th>
+                        <th>Amount</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td class="order-id">#{{ booking.id }}</td>
+                        <td>{{ booking.user.name }}</td>
+                        <td>{{ booking.quantity }}</td>
+                        <td>₹{{ booking.amount }}</td>
+                        <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            title="{{ booking.delivery_address }}">
+                            {{ booking.delivery_address or booking.user.address or '-' }}
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ booking.status }}">
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                        <td>{{ booking.booking_date.strftime('%d %b') }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin.update_booking', booking_id=booking.id) }}">
+                                <select name="status" onchange="this.form.submit()"
+                                    style="padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer; font-size: 0.85rem;">
+                                    <option value="pending" {% if booking.status=='pending' %}selected{% endif %}>⏳
+                                        Pending</option>
+                                    <option value="confirmed" {% if booking.status=='confirmed' %}selected{% endif %}>✓
+                                        Confirmed</option>
+                                    <option value="delivered" {% if booking.status=='delivered' %}selected{% endif %}>🚚
+                                        Delivered</option>
+                                    <option value="cancelled" {% if booking.status=='cancelled' %}selected{% endif %}>✗
+                                        Cancelled</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h3>No bookings found</h3>
+                <p>{% if current_filter != 'all' %}No {{ current_filter }} bookings available{% else %}Bookings will
+                    appear here{% endif %}</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

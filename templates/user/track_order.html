@@ -1,0 +1,536 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Order #{{ booking.id }} - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    /* Order Tracking Styles */
+    .tracking-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .order-card {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(20px);
+        border: var(--border-glass);
+        border-radius: var(--radius-xl);
+        padding: 40px;
+        margin-bottom: 30px;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: var(--border-glass);
+    }
+
+    .order-id-large {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    /* Animated Timeline */
+    .tracking-timeline {
+        position: relative;
+        padding: 30px 0;
+    }
+
+    .timeline-track {
+        position: absolute;
+        top: 65px;
+        left: 50px;
+        right: 50px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        z-index: 0;
+    }
+
+    .timeline-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        transition: width 1s ease;
+    }
+
+    .timeline-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
+    }
+
+    .timeline-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex: 1;
+    }
+
+    .step-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: var(--bg-dark);
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--text-muted);
+        transition: all 0.5s ease;
+        position: relative;
+    }
+
+    .step-icon::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        animation: none;
+    }
+
+    .timeline-step.active .step-icon {
+        background: var(--gradient-primary);
+        border-color: var(--primary);
+        color: white;
+        box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+    }
+
+    .timeline-step.active .step-icon::after {
+        border-color: var(--primary);
+        animation: pulse-ring 1.5s ease-out infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
+    }
+
+    .timeline-step.completed .step-icon {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+    }
+
+    .step-label {
+        margin-top: 15px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+    }
+
+    .timeline-step.active .step-label,
+    .timeline-step.completed .step-label {
+        color: var(--text-primary);
+    }
+
+    .step-time {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    /* Moving Delivery Animation */
+    .delivery-animation {
+        position: relative;
+        height: 120px;
+        margin: 40px 0;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .road {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 10%,
+                rgba(255, 255, 255, 0.3) 90%,
+                transparent 100%);
+    }
+
+    .road::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: repeating-linear-gradient(90deg,
+                white 0px,
+                white 20px,
+                transparent 20px,
+                transparent 40px);
+        animation: road-move 1s linear infinite;
+    }
+
+    @keyframes road-move {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-40px);
+        }
+    }
+
+    .delivery-truck {
+        position: absolute;
+        bottom: 30px;
+        font-size: 3rem;
+        transition: left 2s ease-out;
+        animation: truck-bounce 0.5s ease-in-out infinite;
+    }
+
+    @keyframes truck-bounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-5px);
+        }
+    }
+
+    .delivery-home {
+        position: absolute;
+        bottom: 25px;
+        right: 30px;
+        font-size: 2.5rem;
+    }
+
+    .delivery-warehouse {
+        position: absolute;
+        bottom: 25px;
+        left: 30px;
+        font-size: 2.5rem;
+        color: var(--text-muted);
+    }
+
+    /* Order Details */
+    .order-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .detail-item {
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: var(--radius-md);
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    /* Action Button */
+    .action-section {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: var(--border-glass);
+    }
+
+    .pay-now-btn {
+        background: linear-gradient(135deg, #00D4AA 0%, #00FFD4 100%);
+        animation: glow-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 40px rgba(0, 212, 170, 0.8);
+        }
+    }
+
+    /* Status Messages */
+    .status-message {
+        padding: 20px;
+        border-radius: var(--radius-md);
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .status-message.pending {
+        background: rgba(255, 193, 7, 0.15);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .status-message.payment {
+        background: rgba(0, 212, 170, 0.15);
+        border: 1px solid rgba(0, 212, 170, 0.3);
+    }
+
+    .status-message.delivered {
+        background: rgba(0, 212, 170, 0.15);
+        border: 1px solid rgba(0, 212, 170, 0.3);
+    }
+
+    .status-message i {
+        font-size: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .timeline-steps {
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .timeline-track {
+            display: none;
+        }
+
+        .order-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('user.dashboard') }}"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('user.book') }}"><i class="fas fa-gas-pump"></i><span>Book Cylinder</span></a></li>
+            <li><a href="{{ url_for('user.orders') }}" class="active"><i class="fas fa-box"></i><span>My
+                        Orders</span></a></li>
+            <li><a href="{{ url_for('user.new_connection') }}"><i class="fas fa-plus-circle"></i><span>New
+                        Connection</span></a></li>
+            <li><a href="{{ url_for('user.notifications') }}"><i class="fas fa-bell"></i><span>Notifications</span></a>
+            </li>
+            <li><a href="{{ url_for('user.profile') }}"><i class="fas fa-user-cog"></i><span>Profile</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}"><i class="fas fa-right-from-bracket"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="tracking-container">
+            <!-- Order Card -->
+            <div class="order-card" data-aos="fade-up">
+                <div class="order-header">
+                    <div>
+                        <div class="order-id-large">Order #{{ booking.id }}</div>
+                        <p style="color: var(--text-secondary); margin-top: 5px;">
+                            Placed on {{ booking.booking_date.strftime('%d %B %Y, %I:%M %p') }}
+                        </p>
+                    </div>
+                    <span class="status-badge status-{{ booking.status }}" style="font-size: 1rem; padding: 10px 20px;">
+                        {{ booking.status | upper }}
+                    </span>
+                </div>
+
+                <!-- Animated Timeline -->
+                <div class="tracking-timeline">
+                    <div class="timeline-track">
+                        <div class="timeline-progress" style="width: 
+                            {% if booking.status == 'pending' %}0%
+                            {% elif booking.status == 'confirmed' %}33%
+                            {% elif booking.status == 'paid' %}66%
+                            {% elif booking.status == 'delivered' %}100%
+                            {% else %}0%{% endif %};"></div>
+                    </div>
+
+                    <div class="timeline-steps">
+                        <!-- Step 1: Order Placed -->
+                        <div class="timeline-step completed">
+                            <div class="step-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="step-label">Order Placed</div>
+                            <div class="step-time">{{ booking.booking_date.strftime('%d %b') }}</div>
+                        </div>
+
+                        <!-- Step 2: Confirmed / Pay -->
+                        <div
+                            class="timeline-step {% if booking.status in ['confirmed', 'paid', 'delivered'] %}{% if booking.status == 'confirmed' %}active{% else %}completed{% endif %}{% endif %}">
+                            <div class="step-icon">
+                                {% if booking.status in ['paid', 'delivered'] %}
+                                <i class="fas fa-check"></i>
+                                {% else %}
+                                <i class="fas fa-credit-card"></i>
+                                {% endif %}
+                            </div>
+                            <div class="step-label">{% if booking.status == 'confirmed' %}Pay Now{% else %}Payment{%
+                                endif %}</div>
+                            <div class="step-time">{% if booking.status in ['paid', 'delivered'] %}Paid{% elif
+                                booking.status == 'confirmed' %}Pending{% else %}Waiting{% endif %}</div>
+                        </div>
+
+                        <!-- Step 3: Out for Delivery -->
+                        <div
+                            class="timeline-step {% if booking.status == 'paid' %}active{% elif booking.status == 'delivered' %}completed{% endif %}">
+                            <div class="step-icon">
+                                {% if booking.status == 'delivered' %}
+                                <i class="fas fa-check"></i>
+                                {% else %}
+                                <i class="fas fa-truck"></i>
+                                {% endif %}
+                            </div>
+                            <div class="step-label">Out for Delivery</div>
+                            <div class="step-time">{% if booking.status == 'paid' %}Processing{% elif booking.status ==
+                                'delivered' %}Done{% else %}Waiting{% endif %}</div>
+                        </div>
+
+                        <!-- Step 4: Delivered -->
+                        <div class="timeline-step {% if booking.status == 'delivered' %}completed{% endif %}">
+                            <div class="step-icon">
+                                {% if booking.status == 'delivered' %}
+                                <i class="fas fa-check"></i>
+                                {% else %}
+                                <i class="fas fa-home"></i>
+                                {% endif %}
+                            </div>
+                            <div class="step-label">Delivered</div>
+                            <div class="step-time">{% if booking.delivery_date and booking.status == 'delivered' %}{{
+                                booking.delivery_date.strftime('%d %b') }}{% else %}Pending{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Animation (show when paid or being delivered) -->
+                {% if booking.status in ['paid', 'delivered'] %}
+                <div class="delivery-animation" data-aos="fade-up">
+                    <div class="delivery-warehouse">🏭</div>
+                    <div class="road"></div>
+                    <div class="delivery-truck"
+                        style="left: {% if booking.status == 'delivered' %}calc(100% - 120px){% else %}30%{% endif %};">
+                        🚚</div>
+                    <div class="delivery-home">🏠</div>
+                </div>
+                {% endif %}
+
+                <!-- Status Messages -->
+                {% if booking.status == 'pending' %}
+                <div class="status-message pending">
+                    <i class="fas fa-clock" style="color: #FFC107;"></i>
+                    <div>
+                        <strong>Waiting for Admin Approval</strong>
+                        <p style="color: var(--text-secondary); margin: 0;">Your booking is being reviewed. You'll be
+                            notified once approved.</p>
+                    </div>
+                </div>
+                {% elif booking.status == 'confirmed' %}
+                <div class="status-message payment">
+                    <i class="fas fa-credit-card" style="color: var(--accent);"></i>
+                    <div>
+                        <strong>Payment Required</strong>
+                        <p style="color: var(--text-secondary); margin: 0;">Your booking is approved! Please complete
+                            payment to proceed.</p>
+                    </div>
+                </div>
+                {% elif booking.status == 'paid' %}
+                <div class="status-message payment">
+                    <i class="fas fa-truck" style="color: var(--accent);"></i>
+                    <div>
+                        <strong>Out for Delivery</strong>
+                        <p style="color: var(--text-secondary); margin: 0;">Your payment is confirmed. Your order is
+                            being prepared for delivery.</p>
+                    </div>
+                </div>
+                {% elif booking.status == 'delivered' %}
+                <div class="status-message delivered">
+                    <i class="fas fa-check-circle" style="color: var(--accent);"></i>
+                    <div>
+                        <strong>Order Delivered Successfully! 🎉</strong>
+                        <p style="color: var(--text-secondary); margin: 0;">Thank you for using GasBook. Your cylinder
+                            has been delivered.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Order Details -->
+                <div class="order-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Quantity</div>
+                        <div class="detail-value">{{ booking.quantity }} Cylinder(s)</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Amount</div>
+                        <div class="detail-value" style="color: var(--primary);">₹{{ booking.amount }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Payment Status</div>
+                        <div class="detail-value">{{ booking.payment_status | capitalize }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Delivery Address</div>
+                        <div class="detail-value">{{ booking.delivery_address or current_user.address or 'Not specified'
+                            }}</div>
+                    </div>
+                </div>
+
+                <!-- Action Section -->
+                {% if booking.status == 'confirmed' %}
+                <div class="action-section">
+                    <a href="{{ url_for('user.pay_booking', booking_id=booking.id) }}" class="btn btn-lg pay-now-btn"
+                        style="color: white;">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Pay ₹{{ booking.amount }} Now</span>
+                    </a>
+                </div>
+                {% endif %}
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="{{ url_for('user.orders') }}" class="btn btn-glass">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to Orders</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+
+{% block title %}Gas Booking Portal - Book LPG Cylinders Online{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Navigation -->
+<nav class="navbar glass-nav" id="navbar">
+    <div class="nav-container">
+        <a href="{{ url_for('main.landing') }}" class="nav-logo">
+            <div class="logo-icon">
+                <i class="fas fa-fire-flame-curved"></i>
+            </div>
+            <span class="logo-text">Gas<span class="highlight">Book</span></span>
+        </a>
+        
+        <ul class="nav-links">
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+            <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+        
+        <div class="nav-buttons">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                <span>Get Started</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="hero">
+    <div class="hero-particles" id="heroParticles"></div>
+    
+    <div class="hero-content">
+        <div class="hero-text" data-aos="fade-right" data-aos-delay="100">
+            <div class="hero-badge">
+                <i class="fas fa-bolt"></i>
+                <span>Fast & Reliable Delivery</span>
+            </div>
+            
+            <h1 class="hero-title">
+                Book Your <span class="gradient-text">LPG Gas</span>
+                <br>Cylinder Online
+            </h1>
+            
+            <p class="hero-subtitle">
+                Experience hassle-free gas booking with instant confirmation, 
+                real-time tracking, and doorstep delivery. Join thousands of 
+                satisfied customers today!
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-count="50000">0</span>
+                    <span class="stat-label">Happy Customers</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="100000">0</span>
+                    <span class="stat-label">Deliveries Done</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="500">0</span>
+                    <span class="stat-label">Cities Covered</span>
+                </div>
+            </div>
+            
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket"></i>
+                    <span>Book Now</span>
+                </a>
+                <a href="#how-it-works" class="btn btn-glass btn-lg">
+                    <i class="fas fa-play-circle"></i>
+                    <span>See How It Works</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="hero-visual" data-aos="fade-left" data-aos-delay="300">
+            <div class="cylinder-container" id="cylinderContainer">
+                <!-- 3D Cylinder will be rendered here -->
+                <div class="cylinder-glow"></div>
+                <div class="cylinder-3d">
+                    <div class="cylinder-body">
+                        <div class="cylinder-top"></div>
+                        <div class="cylinder-middle">
+                            <div class="cylinder-label">LPG</div>
+                            <div class="cylinder-weight">14.2 KG</div>
+                        </div>
+                        <div class="cylinder-bottom"></div>
+                        <div class="cylinder-handle"></div>
+                    </div>
+                </div>
+                <div class="floating-elements">
+                    <div class="float-badge badge-1">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>Safe</span>
+                    </div>
+                    <div class="float-badge badge-2">
+                        <i class="fas fa-clock"></i>
+                        <span>24/7</span>
+                    </div>
+                    <div class="float-badge badge-3">
+                        <i class="fas fa-truck-fast"></i>
+                        <span>Fast</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,64 C480,150 960,-20 1440,64 L1440,120 L0,120 Z" fill="var(--bg-dark)"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features" id="features">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">Why Choose Us</span>
+            <h2 class="section-title">Features That Make Us <span class="gradient-text">Stand Out</span></h2>
+            <p class="section-subtitle">We provide the best gas booking experience with cutting-edge technology</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-screen-button"></i>
+                    <div class="icon-bg"></div>
+                </div>
+                <h3>Easy Online Booking</h3>
+                <p>Book your gas cylinder in just a few clicks from anywhere, anytime</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon">
+                    <i class="fas fa-truck-fast"></i>
+                    <div class="icon-bg"></div>
+                </div>
+                <h3>Fast Delivery</h3>
+                <p>Get your cylinder delivered within 24-48 hours at your doorstep</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-icon">
+                    <i class="fas fa-location-dot"></i>
+                    <div class="icon-bg"></div>
+                </div>
+                <h3>Real-time Tracking</h3>
+                <p>Track your order in real-time from booking to delivery</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                    <div class="icon-bg"></div>
+                </div>
+                <h3>SMS & Email Alerts</h3>
+                <p>Get instant notifications about your booking and delivery status</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon">
+                    <i class="fas fa-credit-card"></i>
+                    <div class="icon-bg"></div>
+                </div>
+                <h3>Secure Payments</h3>
+                <p>Multiple payment options with bank-grade security</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-icon">
+                    <i class="fas fa-headset"></i>
+                    <div class="icon-bg"></div>
+                </div>
+                <h3>24/7 Support</h3>
+                <p>Our customer support team is always ready to help you</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works" id="how-it-works">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">Simple Process</span>
+            <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+            <p class="section-subtitle">Book your gas cylinder in 4 simple steps</p>
+        </div>
+        
+        <div class="steps-container">
+            <div class="steps-line"></div>
+            
+            <div class="step" data-aos="fade-up" data-aos-delay="100">
+                <div class="step-number">01</div>
+                <div class="step-content">
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Create Account</h3>
+                    <p>Sign up with your details and verify your identity</p>
+                </div>
+            </div>
+            
+            <div class="step" data-aos="fade-up" data-aos-delay="200">
+                <div class="step-number">02</div>
+                <div class="step-content">
+                    <div class="step-icon">
+                        <i class="fas fa-gas-pump"></i>
+                    </div>
+                    <h3>Select Cylinder</h3>
+                    <p>Choose the cylinder type and quantity you need</p>
+                </div>
+            </div>
+            
+            <div class="step" data-aos="fade-up" data-aos-delay="300">
+                <div class="step-number">03</div>
+                <div class="step-content">
+                    <div class="step-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3>Make Payment</h3>
+                    <p>Pay securely using your preferred payment method</p>
+                </div>
+            </div>
+            
+            <div class="step" data-aos="fade-up" data-aos-delay="400">
+                <div class="step-number">04</div>
+                <div class="step-content">
+                    <div class="step-icon">
+                        <i class="fas fa-house-chimney"></i>
+                    </div>
+                    <h3>Get Delivery</h3>
+                    <p>Receive your cylinder at your doorstep</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials" id="testimonials">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">Testimonials</span>
+            <h2 class="section-title">What Our <span class="gradient-text">Customers Say</span></h2>
+            <p class="section-subtitle">Join thousands of satisfied customers across India</p>
+        </div>
+        
+        <div class="testimonials-track">
+            <div class="testimonials-slider">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"Amazing service! Got my cylinder delivered within 24 hours. The app is so easy to use. Highly recommended!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RS</div>
+                        <div class="author-info">
+                            <h4>Rahul Sharma</h4>
+                            <span>Mumbai</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"No more waiting in queues! This platform has made gas booking so convenient. Love the tracking feature."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">PK</div>
+                        <div class="author-info">
+                            <h4>Priya Kumari</h4>
+                            <span>Delhi</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"Best gas booking platform ever! The customer support is excellent and deliveries are always on time."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AV</div>
+                        <div class="author-info">
+                            <h4>Amit Verma</h4>
+                            <span>Bangalore</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"Very reliable service. SMS notifications keep me updated about my order. Great experience!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SM</div>
+                        <div class="author-info">
+                            <h4>Sneha Mishra</h4>
+                            <span>Chennai</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta" id="cta">
+    <div class="container">
+        <div class="cta-content" data-aos="zoom-in">
+            <div class="cta-icon">
+                <i class="fas fa-fire-flame-curved"></i>
+            </div>
+            <h2>Ready to Book Your Gas Cylinder?</h2>
+            <p>Join over 50,000+ happy customers and experience hassle-free gas booking</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-white btn-lg">
+                    <i class="fas fa-rocket"></i>
+                    <span>Get Started Free</span>
+                </a>
+                <a href="#contact" class="btn btn-outline-white btn-lg">
+                    <i class="fas fa-phone"></i>
+                    <span>Contact Us</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact" id="contact">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="contact-info" data-aos="fade-right">
+                <span class="section-badge">Get In Touch</span>
+                <h2 class="section-title">Contact <span class="gradient-text">Us</span></h2>
+                <p>Have questions? We're here to help you 24/7</p>
+                
+                <div class="contact-items">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>Phone</h4>
+                            <p>+91 1800-XXX-XXXX</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>Email</h4>
+                            <p>support@gasbooking.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-location-dot"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>Address</h4>
+                            <p>123 Gas Street, Mumbai, India</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="contact-form-container" data-aos="fade-left">
+                <form class="contact-form glass-card">
+                    <div class="form-group">
+                        <input type="text" placeholder="Your Name" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="Your Email" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" placeholder="Subject">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="form-group">
+                        <textarea placeholder="Your Message" rows="4" required></textarea>
+                        <i class="fas fa-message"></i>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-full">
+                        <span>Send Message</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="{{ url_for('main.landing') }}" class="footer-logo">
+                    <i class="fas fa-fire-flame-curved"></i>
+                    <span>Gas<span class="highlight">Book</span></span>
+                </a>
+                <p>Your trusted partner for hassle-free LPG gas cylinder booking and delivery.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="{{ url_for('auth.register') }}">Book Cylinder</a></li>
+                    <li><a href="#">New Connection</a></li>
+                    <li><a href="#">Track Order</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-newsletter">
+                <h4>Newsletter</h4>
+                <p>Subscribe for updates and offers</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 GasBook. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+{% endblock %}

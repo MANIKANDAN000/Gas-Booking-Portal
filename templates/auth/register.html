@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Floating Elements -->
+<div class="auth-floating top-left"></div>
+<div class="auth-floating bottom-right"></div>
+
+<div class="auth-layout">
+    <div class="auth-card" data-aos="zoom-in">
+        <!-- Header -->
+        <div class="auth-header">
+            <a href="{{ url_for('main.landing') }}" class="auth-logo">
+                <i class="fas fa-fire-flame-curved"></i>
+                <span>Gas<span class="highlight">Book</span></span>
+            </a>
+            <h1>Create Account</h1>
+            <p>Register to start booking gas cylinders</p>
+        </div>
+
+        <!-- Register Form -->
+        <form class="auth-form" method="POST" action="{{ url_for('auth.register') }}">
+            <div class="form-group">
+                <input type="text" name="name" id="name" placeholder="Full Name" required>
+                <i class="fas fa-user"></i>
+            </div>
+
+            <div class="form-group">
+                <input type="email" name="email" id="email" placeholder="Email Address" required>
+                <i class="fas fa-envelope"></i>
+            </div>
+
+            <div class="form-group">
+                <input type="tel" name="phone" id="phone" placeholder="Phone Number" required>
+                <i class="fas fa-phone"></i>
+            </div>
+
+            <div class="form-group">
+                <input type="password" name="password" id="password" placeholder="Password" required minlength="6">
+                <i class="fas fa-lock"></i>
+            </div>
+
+            <div class="form-group">
+                <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password"
+                    required minlength="6">
+                <i class="fas fa-lock"></i>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#" style="color: var(--primary);">Terms & Conditions</a></span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-full">
+                <i class="fas fa-user-plus"></i>
+                <span>Create Account</span>
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="auth-divider">or continue with</div>
+
+        <!-- Social Login -->
+        <div class="social-auth">
+            <a href="#" class="social-btn">
+                <i class="fab fa-google"></i>
+                <span>Google</span>
+            </a>
+            <a href="#" class="social-btn">
+                <i class="fab fa-facebook-f"></i>
+                <span>Facebook</span>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

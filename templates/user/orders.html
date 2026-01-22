@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('user.dashboard') }}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.book') }}">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Book Cylinder</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.orders') }}" class="active">
+                    <i class="fas fa-box"></i>
+                    <span>My Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.new_connection') }}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Connection</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.profile') }}">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.notifications') }}">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-box"></i> My Orders</h1>
+                <p class="page-subtitle">Track and manage your gas cylinder orders</p>
+            </div>
+            <a href="{{ url_for('user.book') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>New Order</span>
+            </a>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="dashboard-card" data-aos="fade-up">
+            {% if bookings %}
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Booking Date</th>
+                        <th>Delivery Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                        <td class="order-id">#{{ booking.id }}</td>
+                        <td>{{ booking.quantity }} Cylinder(s)</td>
+                        <td>₹{{ booking.amount }}</td>
+                        <td>
+                            <span class="status-badge status-{{ booking.status }}">
+                                <i
+                                    class="fas {% if booking.status == 'pending' %}fa-clock{% elif booking.status == 'confirmed' %}fa-credit-card{% elif booking.status == 'paid' %}fa-truck{% elif booking.status == 'delivered' %}fa-check-circle{% else %}fa-times{% endif %}"></i>
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                        <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+                        <td>
+                            {% if booking.delivery_date and booking.status == 'delivered' %}
+                            {{ booking.delivery_date.strftime('%d %b %Y') }}
+                            {% else %}
+                            <span style="color: var(--text-muted);">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <!-- Track Order Button -->
+                                <a href="{{ url_for('user.track_order', booking_id=booking.id) }}"
+                                    class="action-btn view" title="Track Order">
+                                    <i class="fas fa-location-dot"></i>
+                                </a>
+
+                                <!-- Pay Button (only when confirmed) -->
+                                {% if booking.status == 'confirmed' %}
+                                <a href="{{ url_for('user.pay_booking', booking_id=booking.id) }}" class="action-btn"
+                                    style="background: rgba(0, 212, 170, 0.15); color: var(--accent);" title="Pay Now">
+                                    <i class="fas fa-credit-card"></i>
+                                </a>
+                                {% endif %}
+
+                                <!-- Cancel Button (only when pending) -->
+                                {% if booking.status == 'pending' %}
+                                <a href="{{ url_for('user.cancel_booking', booking_id=booking.id) }}"
+                                    class="action-btn cancel" title="Cancel Order"
+                                    onclick="return confirm('Are you sure you want to cancel this order?')">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h3>No orders yet</h3>
+                <p>Your order history will appear here once you make your first booking</p>
+                <a href="{{ url_for('user.book') }}" class="btn btn-primary">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Book Your First Cylinder</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

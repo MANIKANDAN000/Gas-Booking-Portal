@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.users') }}" class="active">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.bookings') }}">
+                    <i class="fas fa-box"></i>
+                    <span>Bookings</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.connections') }}">
+                    <i class="fas fa-plug"></i>
+                    <span>Connections</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-users"></i> Manage Users</h1>
+                <p class="page-subtitle">View and manage all registered users</p>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="dashboard-card" data-aos="fade-up">
+            {% if users %}
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>City</th>
+                        <th>Registered</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
+                        <td>#{{ user.id }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="user-avatar" style="width: 35px; height: 35px; font-size: 0.85rem;">{{
+                                    user.name[0] }}</div>
+                                {{ user.name }}
+                            </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>{{ user.city or '-' }}</td>
+                        <td>{{ user.created_at.strftime('%d %b %Y') }}</td>
+                        <td>
+                            <span
+                                class="status-badge {% if user.is_active %}status-delivered{% else %}status-cancelled{% endif %}">
+                                {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>No users found</h3>
+                <p>Users will appear here once they register</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

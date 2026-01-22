@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Orders - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    .track-card {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(20px);
+        border: var(--border-glass);
+        border-radius: var(--radius-xl);
+        padding: 25px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .track-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255, 107, 53, 0.3);
+    }
+
+    .track-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .track-order-id {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .track-amount {
+        font-weight: 600;
+    }
+
+    /* Mini Timeline */
+    .mini-timeline {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        position: relative;
+    }
+
+    .mini-timeline::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 30px;
+        right: 30px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-50%);
+        z-index: 0;
+    }
+
+    .mini-step {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .mini-step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--bg-dark);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+    }
+
+    .mini-step.active .mini-step-icon {
+        background: var(--gradient-primary);
+        border-color: var(--primary);
+        color: white;
+        box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+        animation: pulse-mini 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-mini {
+
+        0%,
+        100% {
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 25px rgba(255, 107, 53, 0.7);
+        }
+    }
+
+    .mini-step.completed .mini-step-icon {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+    }
+
+    .mini-step-label {
+        font-size: 0.75rem;
+        margin-top: 8px;
+        color: var(--text-muted);
+    }
+
+    .mini-step.active .mini-step-label,
+    .mini-step.completed .mini-step-label {
+        color: var(--text-primary);
+    }
+
+    /* Delivery Animation */
+    .delivery-bar {
+        position: relative;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        margin: 15px 0;
+    }
+
+    .delivery-road {
+        position: absolute;
+        bottom: 15px;
+        left: 20px;
+        right: 20px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+    }
+
+    .delivery-road::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: repeating-linear-gradient(90deg, #fff 0px, #fff 10px, transparent 10px, transparent 20px);
+        animation: road-dash 0.5s linear infinite;
+    }
+
+    @keyframes road-dash {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-20px);
+        }
+    }
+
+    .delivery-truck-mini {
+        position: absolute;
+        bottom: 20px;
+        font-size: 1.5rem;
+        animation: truck-move 3s ease-in-out infinite, truck-bounce-mini 0.3s ease-in-out infinite;
+    }
+
+    @keyframes truck-move {
+
+        0%,
+        100% {
+            left: 20px;
+        }
+
+        50% {
+            left: calc(100% - 60px);
+        }
+    }
+
+    @keyframes truck-bounce-mini {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    .delivery-points {
+        position: absolute;
+        bottom: 18px;
+        font-size: 1rem;
+    }
+
+    .delivery-start {
+        left: 10px;
+    }
+
+    .delivery-end {
+        right: 10px;
+    }
+
+    /* Action Button */
+    .track-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .track-btn {
+        padding: 10px 20px;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .track-btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .track-btn-pay {
+        background: linear-gradient(135deg, #00D4AA, #00FFD4);
+        color: white;
+        animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+
+        0%,
+        100% {
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+        }
+
+        50% {
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.6);
+        }
+    }
+
+    .track-btn-secondary {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-secondary);
+    }
+
+    .track-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Section Headers */
+    .section-title {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        color: var(--primary);
+    }
+
+    /* Empty State */
+    .no-orders {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+    }
+
+    .no-orders i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('user.dashboard') }}"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('user.book') }}"><i class="fas fa-gas-pump"></i><span>Book Cylinder</span></a></li>
+            <li><a href="{{ url_for('user.orders') }}"><i class="fas fa-box"></i><span>My Orders</span></a></li>
+            <li><a href="{{ url_for('user.track_orders') }}" class="active"><i class="fas fa-truck-fast"></i><span>Track
+                        Orders</span></a></li>
+            <li><a href="{{ url_for('user.new_connection') }}"><i class="fas fa-plus-circle"></i><span>New
+                        Connection</span></a></li>
+            <li><a href="{{ url_for('user.notifications') }}"><i class="fas fa-bell"></i><span>Notifications</span></a>
+            </li>
+            <li><a href="{{ url_for('user.profile') }}"><i class="fas fa-user-cog"></i><span>Profile</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}"><i class="fas fa-right-from-bracket"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-truck-fast"></i> Track Orders</h1>
+                <p class="page-subtitle">Real-time tracking of your gas cylinder deliveries</p>
+            </div>
+        </div>
+
+        <!-- Active Orders -->
+        <h3 class="section-title" data-aos="fade-up"><i class="fas fa-spinner fa-spin"></i> Active Orders</h3>
+
+        {% if active_bookings %}
+        {% for booking in active_bookings %}
+        <div class="track-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+            <div class="track-header">
+                <div>
+                    <span class="track-order-id">Order #{{ booking.id }}</span>
+                    <span style="color: var(--text-muted); margin-left: 10px;">• {{ booking.quantity }}
+                        Cylinder(s)</span>
+                </div>
+                <div>
+                    <span class="track-amount" style="color: var(--primary);">₹{{ booking.amount }}</span>
+                    <span class="status-badge status-{{ booking.status }}" style="margin-left: 10px;">{{ booking.status
+                        }}</span>
+                </div>
+            </div>
+
+            <!-- Mini Timeline -->
+            <div class="mini-timeline">
+                <div class="mini-step completed">
+                    <div class="mini-step-icon"><i class="fas fa-check"></i></div>
+                    <span class="mini-step-label">Ordered</span>
+                </div>
+                <div
+                    class="mini-step {% if booking.status in ['confirmed', 'paid'] %}{% if booking.status == 'confirmed' %}active{% else %}completed{% endif %}{% endif %}">
+                    <div class="mini-step-icon"><i
+                            class="fas fa-{% if booking.status in ['paid'] %}check{% else %}credit-card{% endif %}"></i>
+                    </div>
+                    <span class="mini-step-label">{% if booking.status == 'confirmed' %}Pay Now{% else %}Payment{% endif
+                        %}</span>
+                </div>
+                <div class="mini-step {% if booking.status == 'paid' %}active{% endif %}">
+                    <div class="mini-step-icon"><i class="fas fa-truck"></i></div>
+                    <span class="mini-step-label">Delivering</span>
+                </div>
+                <div class="mini-step">
+                    <div class="mini-step-icon"><i class="fas fa-home"></i></div>
+                    <span class="mini-step-label">Delivered</span>
+                </div>
+            </div>
+
+            <!-- Delivery Animation (show when paid) -->
+            {% if booking.status == 'paid' %}
+            <div class="delivery-bar">
+                <span class="delivery-points delivery-start">🏭</span>
+                <div class="delivery-road"></div>
+                <div class="delivery-truck-mini">🚚</div>
+                <span class="delivery-points delivery-end">🏠</span>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="track-actions">
+                {% if booking.status == 'confirmed' %}
+                <a href="{{ url_for('user.pay_booking', booking_id=booking.id) }}" class="track-btn track-btn-pay">
+                    <i class="fas fa-credit-card"></i> Pay Now
+                </a>
+                {% endif %}
+                <a href="{{ url_for('user.track_order', booking_id=booking.id) }}"
+                    class="track-btn track-btn-secondary">
+                    <i class="fas fa-eye"></i> View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="track-card">
+            <div class="no-orders">
+                <i class="fas fa-box-open"></i>
+                <h3>No Active Orders</h3>
+                <p>You don't have any orders in progress</p>
+                <a href="{{ url_for('user.book') }}" class="btn btn-primary" style="margin-top: 20px;">
+                    <i class="fas fa-gas-pump"></i> Book Now
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recently Delivered -->
+        {% if delivered_bookings %}
+        <h3 class="section-title" data-aos="fade-up" style="margin-top: 40px;"><i class="fas fa-check-circle"></i>
+            Recently Delivered</h3>
+
+        {% for booking in delivered_bookings %}
+        <div class="track-card" data-aos="fade-up" style="opacity: 0.8;">
+            <div class="track-header">
+                <div>
+                    <span class="track-order-id">Order #{{ booking.id }}</span>
+                    <span style="color: var(--text-muted); margin-left: 10px;">• {{ booking.quantity }}
+                        Cylinder(s)</span>
+                </div>
+                <div>
+                    <span class="status-badge status-delivered"><i class="fas fa-check"></i> Delivered</span>
+                </div>
+            </div>
+
+            <div class="mini-timeline">
+                <div class="mini-step completed">
+                    <div class="mini-step-icon"><i class="fas fa-check"></i></div><span
+                        class="mini-step-label">Ordered</span>
+                </div>
+                <div class="mini-step completed">
+                    <div class="mini-step-icon"><i class="fas fa-check"></i></div><span
+                        class="mini-step-label">Paid</span>
+                </div>
+                <div class="mini-step completed">
+                    <div class="mini-step-icon"><i class="fas fa-check"></i></div><span
+                        class="mini-step-label">Shipped</span>
+                </div>
+                <div class="mini-step completed">
+                    <div class="mini-step-icon"><i class="fas fa-check"></i></div><span
+                        class="mini-step-label">Delivered</span>
+                </div>
+            </div>
+
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                <i class="fas fa-calendar-check"></i> Delivered on {{ booking.delivery_date.strftime('%d %B %Y') if
+                booking.delivery_date else 'N/A' }}
+            </p>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

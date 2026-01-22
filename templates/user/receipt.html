@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Receipt - Order #{{ booking.id }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    .receipt-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .receipt-card {
+        background: white;
+        color: #1a1a2e;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+
+    /* Watermark */
+    .receipt-card::before {
+        content: 'GasBook';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-30deg);
+        font-size: 8rem;
+        font-weight: 900;
+        color: rgba(255, 107, 53, 0.06);
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 0;
+    }
+
+    .receipt-header {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        position: relative;
+    }
+
+    .receipt-logo {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .receipt-logo i {
+        margin-right: 10px;
+    }
+
+    .receipt-title {
+        font-size: 1.3rem;
+        opacity: 0.9;
+    }
+
+    .receipt-stamp {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .receipt-body {
+        padding: 30px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .receipt-section {
+        margin-bottom: 25px;
+    }
+
+    .receipt-section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .receipt-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .receipt-row:last-child {
+        border-bottom: none;
+    }
+
+    .receipt-label {
+        color: #666;
+    }
+
+    .receipt-value {
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+
+    .receipt-total-row {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+        color: white;
+        margin: 20px -30px;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .receipt-info-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .receipt-info-box h4 {
+        margin-bottom: 10px;
+        color: #1a1a2e;
+    }
+
+    .receipt-info-box p {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .receipt-footer {
+        text-align: center;
+        padding: 20px 30px 30px;
+        border-top: 2px dashed #eee;
+        color: #888;
+        font-size: 0.9rem;
+    }
+
+    .receipt-footer .thank-you {
+        font-size: 1.3rem;
+        color: #FF6B35;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .receipt-qr {
+        width: 80px;
+        height: 80px;
+        background: #f0f0f0;
+        margin: 15px auto;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #aaa;
+        font-size: 0.8rem;
+    }
+
+    .receipt-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+    .print-btn {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .print-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+    }
+
+    .back-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        .receipt-card,
+        .receipt-card * {
+            visibility: visible;
+        }
+
+        .receipt-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            box-shadow: none;
+        }
+
+        .receipt-actions,
+        .sidebar,
+        .page-header {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('user.dashboard') }}"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('user.book') }}"><i class="fas fa-gas-pump"></i><span>Book Cylinder</span></a></li>
+            <li><a href="{{ url_for('user.orders') }}"><i class="fas fa-box"></i><span>My Orders</span></a></li>
+            <li><a href="{{ url_for('user.track_orders') }}"><i class="fas fa-truck-fast"></i><span>Track
+                        Orders</span></a></li>
+            <li><a href="{{ url_for('user.new_connection') }}"><i class="fas fa-plus-circle"></i><span>New
+                        Connection</span></a></li>
+            <li><a href="{{ url_for('user.notifications') }}"><i class="fas fa-bell"></i><span>Notifications</span></a>
+            </li>
+            <li><a href="{{ url_for('user.profile') }}"><i class="fas fa-user-cog"></i><span>Profile</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}"><i class="fas fa-right-from-bracket"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-receipt"></i> Payment Receipt</h1>
+                <p class="page-subtitle">Your payment was successful</p>
+            </div>
+        </div>
+
+        <div class="receipt-container" data-aos="zoom-in">
+            <div class="receipt-card">
+                <!-- Header -->
+                <div class="receipt-header">
+                    <div class="receipt-stamp">✓ PAID</div>
+                    <div class="receipt-logo">
+                        <i class="fas fa-fire-flame-curved"></i>
+                        Gas Booking Portal
+                    </div>
+                    <div class="receipt-title">Payment Receipt</div>
+                </div>
+
+                <!-- Body -->
+                <div class="receipt-body">
+                    <!-- Order Details -->
+                    <div class="receipt-section">
+                        <div class="receipt-section-title">Order Information</div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Receipt No.</span>
+                            <span class="receipt-value">RCP-{{ booking.id }}-{{ booking.booking_date.strftime('%Y%m%d')
+                                }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Order ID</span>
+                            <span class="receipt-value">#{{ booking.id }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Order Date</span>
+                            <span class="receipt-value">{{ booking.booking_date.strftime('%d %B %Y, %I:%M %p') }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Payment Date</span>
+                            <span class="receipt-value">{{ now.strftime('%d %B %Y, %I:%M %p') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Details -->
+                    <div class="receipt-section">
+                        <div class="receipt-section-title">Customer Details</div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Name</span>
+                            <span class="receipt-value">{{ booking.user.name }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Email</span>
+                            <span class="receipt-value">{{ booking.user.email }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Phone</span>
+                            <span class="receipt-value">{{ booking.user.phone or 'N/A' }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Delivery Address</span>
+                            <span class="receipt-value">{{ booking.delivery_address or booking.user.address or 'N/A'
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Items -->
+                    <div class="receipt-section">
+                        <div class="receipt-section-title">Order Items</div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">LPG Cylinder × {{ booking.quantity }}</span>
+                            <span class="receipt-value">₹{{ (booking.amount - 50) }}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span class="receipt-label">Delivery Charge</span>
+                            <span class="receipt-value">₹50</span>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="receipt-total-row">
+                        <span>Total Paid</span>
+                        <span>₹{{ booking.amount }}</span>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="receipt-info-box">
+                        <h4><i class="fas fa-truck"></i> Delivery Information</h4>
+                        <p>Your order is now being processed for delivery. You will receive a notification once your
+                            cylinder is out for delivery. Expected delivery: 2-3 business days.</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="receipt-footer">
+                    <div class="thank-you">Thank You for Your Order! 🎉</div>
+                    <p>For support, contact: support@gasbooking.com | +91 98765 43210</p>
+                    <div class="receipt-qr">
+                        <i class="fas fa-qrcode" style="font-size: 2rem;"></i>
+                    </div>
+                    <small>This is a computer-generated receipt. No signature required.</small>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="receipt-actions">
+                <a href="javascript:window.print()" class="print-btn">
+                    <i class="fas fa-print"></i> Print Receipt
+                </a>
+                <a href="{{ url_for('user.track_order', booking_id=booking.id) }}" class="back-btn">
+                    <i class="fas fa-truck"></i> Track Order
+                </a>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

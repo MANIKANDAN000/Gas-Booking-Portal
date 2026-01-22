@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}" class="active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.bookings') }}">
+                    <i class="fas fa-box"></i>
+                    <span>Bookings</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.connections') }}">
+                    <i class="fas fa-plug"></i>
+                    <span>Connections</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title">Admin Dashboard 📊</h1>
+                <p class="page-subtitle">Overview of your gas booking system</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" style="background: var(--gradient-accent);">A</div>
+                <div class="user-details">
+                    <h4>{{ current_user.name }}</h4>
+                    <span>Administrator</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value">{{ total_users }}</div>
+                <div class="stat-card-label">Total Users</div>
+            </div>
+
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value">{{ total_bookings }}</div>
+                <div class="stat-card-label">Total Bookings</div>
+            </div>
+
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value">{{ pending_bookings }}</div>
+                <div class="stat-card-label">Pending Orders</div>
+            </div>
+
+            <div class="stat-card accent" data-aos="fade-up" data-aos-delay="400">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-indian-rupee-sign"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value">₹{{ "{:,.0f}".format(total_revenue) }}</div>
+                <div class="stat-card-label">Total Revenue</div>
+            </div>
+        </div>
+
+        <!-- Additional Stats Row -->
+        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 25px;">
+            <div class="stat-card" data-aos="fade-up">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value">{{ delivered_bookings }}</div>
+                <div class="stat-card-label">Delivered Orders</div>
+            </div>
+
+            <div class="stat-card" data-aos="fade-up">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                </div>
+                <div class="stat-card-value">{{ pending_connections }}</div>
+                <div class="stat-card-label">Pending Connections</div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="dashboard-card" data-aos="fade-up">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> Recent Bookings</h3>
+                <a href="{{ url_for('admin.bookings') }}">View All</a>
+            </div>
+
+            {% if recent_bookings %}
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in recent_bookings %}
+                    <tr>
+                        <td class="order-id">#{{ booking.id }}</td>
+                        <td>{{ booking.user.name }}</td>
+                        <td>{{ booking.quantity }}</td>
+                        <td>₹{{ booking.amount }}</td>
+                        <td>
+                            <span class="status-badge status-{{ booking.status }}">
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                        <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin.update_booking', booking_id=booking.id) }}"
+                                style="display: inline;">
+                                <select name="status" onchange="this.form.submit()"
+                                    style="padding: 6px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer;">
+                                    <option value="pending" {% if booking.status=='pending' %}selected{% endif %}>
+                                        Pending</option>
+                                    <option value="confirmed" {% if booking.status=='confirmed' %}selected{% endif %}>
+                                        Confirmed</option>
+                                    <option value="delivered" {% if booking.status=='delivered' %}selected{% endif %}>
+                                        Delivered</option>
+                                    <option value="cancelled" {% if booking.status=='cancelled' %}selected{% endif %}>
+                                        Cancelled</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h3>No bookings yet</h3>
+                <p>Bookings will appear here once customers start ordering</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

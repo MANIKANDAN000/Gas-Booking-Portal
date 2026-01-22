@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('user.dashboard') }}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.book') }}">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Book Cylinder</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.orders') }}">
+                    <i class="fas fa-box"></i>
+                    <span>My Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.new_connection') }}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Connection</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('user.profile') }}" class="active">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-user-cog"></i> My Profile</h1>
+                <p class="page-subtitle">Manage your account settings and preferences</p>
+            </div>
+        </div>
+
+        <!-- Profile Form -->
+        <div class="dashboard-card booking-form-container" data-aos="fade-up">
+            <form method="POST" action="{{ url_for('user.profile') }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" name="name" id="name" value="{{ current_user.name }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" value="{{ current_user.email }}" disabled>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" name="phone" id="phone" value="{{ current_user.phone }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" name="city" id="city" value="{{ current_user.city or '' }}"
+                            placeholder="Enter your city">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" name="pincode" id="pincode" value="{{ current_user.pincode or '' }}"
+                            placeholder="Enter pincode">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="member_since">Member Since</label>
+                        <input type="text" id="member_since" value="{{ current_user.created_at.strftime('%d %b %Y') }}"
+                            disabled>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address">Complete Address</label>
+                    <textarea name="address" id="address" rows="3"
+                        placeholder="Enter your complete address">{{ current_user.address or '' }}</textarea>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i>
+                        <span>Save Changes</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

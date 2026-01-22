@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - Admin - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    .notification-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .notification-item {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(10px);
+        border: var(--border-glass);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .notification-item:hover {
+        transform: translateX(5px);
+        border-color: rgba(255, 107, 53, 0.3);
+    }
+
+    .notification-item.unread {
+        border-left: 4px solid var(--primary);
+    }
+
+    .notification-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .notification-icon.info {
+        background: rgba(33, 150, 243, 0.15);
+        color: #2196F3;
+    }
+
+    .notification-icon.success {
+        background: rgba(0, 212, 170, 0.15);
+        color: var(--accent);
+    }
+
+    .notification-icon.warning {
+        background: rgba(255, 193, 7, 0.15);
+        color: #FFC107;
+    }
+
+    .notification-icon.payment {
+        background: rgba(0, 212, 170, 0.15);
+        color: var(--accent);
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .notification-message {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .notification-time {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-top: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+            </li>
+            <li><a href="{{ url_for('admin.users') }}"><i class="fas fa-users"></i><span>Users</span></a></li>
+            <li><a href="{{ url_for('admin.bookings') }}"><i class="fas fa-box"></i><span>Bookings</span></a></li>
+            <li><a href="{{ url_for('admin.connections') }}"><i class="fas fa-plug"></i><span>Connections</span></a>
+            </li>
+            <li><a href="{{ url_for('admin.notifications') }}" class="active"><i
+                        class="fas fa-bell"></i><span>Notifications</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}"><i class="fas fa-right-from-bracket"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header" data-aos="fade-down">
+            <div>
+                <h1 class="page-title"><i class="fas fa-bell"></i> Admin Notifications</h1>
+                <p class="page-subtitle">View booking requests and payment alerts</p>
+            </div>
+        </div>
+
+        <div class="dashboard-card" data-aos="fade-up">
+            {% if notifications %}
+            <div class="notification-list">
+                {% for notification in notifications %}
+                <a href="{{ notification.link or '#' }}"
+                    class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                    <div class="notification-icon {{ notification.type }}">
+                        <i
+                            class="fas {% if notification.type == 'success' %}fa-check-circle{% elif notification.type == 'warning' %}fa-exclamation-triangle{% elif notification.type == 'payment' %}fa-credit-card{% else %}fa-info-circle{% endif %}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-message">{{ notification.message }}</div>
+                        <div class="notification-time"><i class="fas fa-clock"></i> {{
+                            notification.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <h3>No notifications yet</h3>
+                <p>You'll receive notifications about new bookings and payments here</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

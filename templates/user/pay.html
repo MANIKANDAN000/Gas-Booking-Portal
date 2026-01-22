@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Pay for Order #{{ booking.id }} - Gas Booking Portal{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<style>
+    .payment-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .payment-card {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(20px);
+        border: var(--border-glass);
+        border-radius: var(--radius-xl);
+        padding: 40px;
+        text-align: center;
+    }
+
+    .payment-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #00D4AA 0%, #00FFD4 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 25px;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(0, 212, 170, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 0 20px rgba(0, 212, 170, 0);
+        }
+    }
+
+    .payment-amount {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin: 20px 0;
+    }
+
+    .payment-details {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        margin: 25px 0;
+        text-align: left;
+    }
+
+    .payment-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: var(--border-glass);
+    }
+
+    .payment-row:last-child {
+        border-bottom: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .payment-methods {
+        display: flex;
+        gap: 15px;
+        margin: 25px 0;
+    }
+
+    .payment-method {
+        flex: 1;
+        padding: 20px 15px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .payment-method:hover {
+        border-color: var(--primary);
+        background: rgba(255, 107, 53, 0.1);
+    }
+
+    .payment-method.selected {
+        border-color: var(--accent);
+        background: rgba(0, 212, 170, 0.1);
+    }
+
+    .payment-method i {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .pay-btn {
+        background: linear-gradient(135deg, #00D4AA 0%, #00FFD4 100%);
+        width: 100%;
+        padding: 18px;
+        font-size: 1.1rem;
+    }
+
+    .secure-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .secure-badge i {
+        color: var(--accent);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('main.landing') }}" class="sidebar-logo">
+            <i class="fas fa-fire-flame-curved"></i>
+            <span>Gas<span class="highlight">Book</span></span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('user.dashboard') }}"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('user.book') }}"><i class="fas fa-gas-pump"></i><span>Book Cylinder</span></a></li>
+            <li><a href="{{ url_for('user.orders') }}" class="active"><i class="fas fa-box"></i><span>My
+                        Orders</span></a></li>
+            <li><a href="{{ url_for('user.new_connection') }}"><i class="fas fa-plus-circle"></i><span>New
+                        Connection</span></a></li>
+            <li><a href="{{ url_for('user.notifications') }}"><i class="fas fa-bell"></i><span>Notifications</span></a>
+            </li>
+            <li><a href="{{ url_for('user.profile') }}"><i class="fas fa-user-cog"></i><span>Profile</span></a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}"><i class="fas fa-right-from-bracket"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="payment-container">
+            <div class="payment-card" data-aos="zoom-in">
+                <div class="payment-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+
+                <h2>Complete Payment</h2>
+                <p style="color: var(--text-secondary);">Order #{{ booking.id }}</p>
+
+                <div class="payment-amount">₹{{ booking.amount }}</div>
+
+                <div class="payment-details">
+                    <div class="payment-row">
+                        <span>Cylinder ({{ booking.quantity }}x)</span>
+                        <span>₹{{ booking.quantity * 900 }}</span>
+                    </div>
+                    <div class="payment-row">
+                        <span>Delivery Charge</span>
+                        <span>₹50</span>
+                    </div>
+                    <div class="payment-row">
+                        <span>Total</span>
+                        <span style="color: var(--primary);">₹{{ booking.amount }}</span>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <div class="payment-method selected" onclick="selectPayment(this)">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>UPI</span>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment(this)">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Card</span>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment(this)">
+                        <i class="fas fa-building-columns"></i>
+                        <span>NetBanking</span>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('user.pay_booking', booking_id=booking.id) }}">
+                    <button type="submit" class="btn pay-btn">
+                        <i class="fas fa-lock"></i>
+                        <span>Pay ₹{{ booking.amount }} Securely</span>
+                    </button>
+                </form>
+
+                <div class="secure-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Secured by 256-bit SSL encryption</span>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <a href="{{ url_for('user.track_order', booking_id=booking.id) }}"
+                        style="color: var(--text-muted); text-decoration: none;">
+                        <i class="fas fa-arrow-left"></i> Back to Order
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function selectPayment(element) {
+        document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+</script>
+{% endblock %}
